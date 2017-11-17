@@ -161,7 +161,7 @@ public class _CellularGUI extends javax.swing.JFrame {
 
         lab_stat_dead.setText("Dead: 0");
 
-        lab_stat_runtime.setText("Runtime: 0s");
+        lab_stat_runtime.setText("Runtime: 00h:00m:00s");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -187,9 +187,9 @@ public class _CellularGUI extends javax.swing.JFrame {
                         .addComponent(lab_stat_live)
                         .addGap(103, 103, 103)
                         .addComponent(lab_stat_dead)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 113, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
                         .addComponent(lab_stat_runtime)
-                        .addGap(86, 86, 86))))
+                        .addGap(50, 50, 50))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
