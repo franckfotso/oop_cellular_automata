@@ -5,10 +5,12 @@
  */
 package oop.cellular.view;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author romuald.fotso
  */
-public class CellularGUI {
+public class CellularGUI extends JFrame {
     
 }
