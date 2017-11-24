@@ -16,16 +16,29 @@
  */
 package oop.cellular.controller;
 
+import java.util.ArrayList;
 import oop.cellular.model.AbstractModel;
+import oop.cellular.model.Display;
+import oop.cellular.model.Game;
+import oop.cellular.model.Setting;
+import oop.cellular.view.CellularGUI;
+import oop.cellular.view.PanDisplay;
 
 /**
  *
  * @author romuald.fotso
  */
 public class GameController extends AbstractController{
-
+    
+    private CellularGUI cellularGUI;
+    
     public GameController(AbstractModel model) {
         super(model);
+    }
+
+    public GameController(AbstractModel model, CellularGUI cellularGUI) {
+        super(model);
+        this.cellularGUI = cellularGUI; // set view to controller
     }
 
     @Override
@@ -35,7 +48,27 @@ public class GameController extends AbstractController{
 
     @Override
     public void initialize() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String pattern = this.cellularGUI.getCb_pattern().getSelectedItem().toString();
+        String form = this.cellularGUI.getCb_form().getSelectedItem().toString();
+        int size = this.cellularGUI.getSlider_size().getValue();
+        int speed = this.cellularGUI.getSlider_speed().getValue();        
+        Setting setting = new Setting(pattern, form, size, speed);
+        
+        PanDisplay pan_display = this.cellularGUI.getPan_display();
+        int display_W = pan_display.getWidth();
+        int display_H = pan_display.getHeight();
+        int nb_bins = display_W*display_H;
+        boolean [][] bins = new boolean[display_H][display_W];
+        
+        for (int i=0; i<display_H; i++)
+            for (int j=0; j<display_W; j++)
+                bins[i][j] = false;
+        
+        Display display = new Display(pan_display.getWidth(), 
+                pan_display.getHeight(), 0, nb_bins, bins);
+        
+        Game game = new Game(0, null, display, setting);
+        this.model = game; // set model to controller
     }
 
     @Override

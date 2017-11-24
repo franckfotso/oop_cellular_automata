@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @author romuald.fotso
  */
-public class Game {
+public class Game extends AbstractModel{
     
     private int trick;
     private Date runtime;
