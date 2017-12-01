@@ -15,6 +15,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import oop.cellular.controller.AbstractController;
 import oop.cellular.controller.GameController;
+import oop.cellular.model.Display;
+import oop.cellular.model.Game;
+import oop.cellular.model.Setting;
 import oop.cellular.observer.Observable;
 import oop.cellular.observer.Observer;
 
@@ -56,7 +59,8 @@ public class CellularGUI extends JFrame implements Observer{
         //this.setLocationRelativeTo(null);
         
         // configure GUI
-        this.initComponents();		
+        this.initComponents();
+        pack();
 	
         // Use Look & Feel System
 	try {
@@ -120,11 +124,17 @@ public class CellularGUI extends JFrame implements Observer{
         game_controller.initialize(); // involving model initialization
         
         this.controllers.put("game_controller", game_controller);
+        this.pan_display.setCellularGUI(this);
+    }
+
+    public HashMap<String, AbstractController> getControllers() {
+        return controllers;
+    }
+
+    public void setControllers(HashMap<String, AbstractController> controllers) {
+        this.controllers = controllers;
     }
     
-    public void initDisplay(){
-        
-    }
     
     public void initComponents(){
         
@@ -305,7 +315,12 @@ public class CellularGUI extends JFrame implements Observer{
                     .addComponent(lab_stat_runtime))
                 .addContainerGap())
         );
-        pack();       
+        
+        // RFM add
+        slider_size.setValue(10);
+        slider_speed.setValue(10);
+        
+        //pack();       
     }
     
     public void initEvents(){
