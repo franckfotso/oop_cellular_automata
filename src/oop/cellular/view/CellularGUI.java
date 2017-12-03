@@ -6,13 +6,22 @@
 package oop.cellular.view;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.TimeZone;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import oop.cellular.controller.AbstractController;
 import oop.cellular.controller.GameController;
 import oop.cellular.model.Display;
@@ -30,7 +39,7 @@ public class CellularGUI extends JFrame implements Observer{
     private HashMap<String,AbstractController> controllers;
     
     private javax.swing.JButton btn_play;
-    private javax.swing.JButton btn_resume;
+    private javax.swing.JButton btn_pause;
     private javax.swing.JComboBox<String> cb_form;
     private javax.swing.JComboBox<String> cb_pattern;
     private javax.swing.JSeparator jSeparator1;
@@ -116,25 +125,54 @@ public class CellularGUI extends JFrame implements Observer{
     public void setSlider_speed(JSlider slider_speed) {
         this.slider_speed = slider_speed;
     }
-    
-    
-    public void initControllers(){
-        // init game controller
-        GameController game_controller = new GameController(null, this);
-        game_controller.initialize(); // involving model initialization
-        
-        this.controllers.put("game_controller", game_controller);
-        this.pan_display.setCellularGUI(this);
+
+    public JLabel getLab_stat_dead() {
+        return lab_stat_dead;
     }
 
+    public void setLab_stat_dead(JLabel lab_stat_dead) {
+        this.lab_stat_dead = lab_stat_dead;
+    }
+
+    public JLabel getLab_stat_live() {
+        return lab_stat_live;
+    }
+
+    public void setLab_stat_live(JLabel lab_stat_live) {
+        this.lab_stat_live = lab_stat_live;
+    }
+
+    public JLabel getLab_stat_form() {
+        return lab_stat_form;
+    }
+
+    public void setLab_stat_form(JLabel lab_stat_form) {
+        this.lab_stat_form = lab_stat_form;
+    }
+
+    public JLabel getLab_stat_runtime() {
+        return lab_stat_runtime;
+    }
+
+    public void setLab_stat_runtime(JLabel lab_stat_runtime) {
+        this.lab_stat_runtime = lab_stat_runtime;
+    }
+
+    public JLabel getLab_stat_trick() {
+        return lab_stat_trick;
+    }
+
+    public void setLab_stat_trick(JLabel lab_stat_trick) {
+        this.lab_stat_trick = lab_stat_trick;
+    }
+    
     public HashMap<String, AbstractController> getControllers() {
         return controllers;
     }
 
     public void setControllers(HashMap<String, AbstractController> controllers) {
         this.controllers = controllers;
-    }
-    
+    }    
     
     public void initComponents(){
         
@@ -151,7 +189,7 @@ public class CellularGUI extends JFrame implements Observer{
         lab_speed = new javax.swing.JLabel();
         pan_controls = new javax.swing.JPanel();
         btn_play = new javax.swing.JButton();
-        btn_resume = new javax.swing.JButton();
+        btn_pause = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         lab_stat_form = new javax.swing.JLabel();
         lab_stat_trick = new javax.swing.JLabel();
@@ -236,8 +274,8 @@ public class CellularGUI extends JFrame implements Observer{
 
         btn_play.setText("Play");
 
-        btn_resume.setText("Resume");
-        btn_resume.setEnabled(false);
+        btn_pause.setText("Pause");
+        btn_pause.setEnabled(false);
 
         javax.swing.GroupLayout pan_controlsLayout = new javax.swing.GroupLayout(pan_controls);
         pan_controls.setLayout(pan_controlsLayout);
@@ -247,7 +285,7 @@ public class CellularGUI extends JFrame implements Observer{
                 .addContainerGap(20, Short.MAX_VALUE)
                 .addComponent(btn_play, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btn_resume, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btn_pause, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         pan_controlsLayout.setVerticalGroup(
@@ -256,7 +294,7 @@ public class CellularGUI extends JFrame implements Observer{
                 .addContainerGap()
                 .addGroup(pan_controlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_play)
-                    .addComponent(btn_resume))
+                    .addComponent(btn_pause))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
 
@@ -264,7 +302,7 @@ public class CellularGUI extends JFrame implements Observer{
         lab_stat_trick.setText("Trick: 0");
         lab_stat_live.setText("Live: 0");
         lab_stat_dead.setText("Dead: 0");
-        lab_stat_runtime.setText("Runtime: 00h:00m:00s");
+        lab_stat_runtime.setText("Runtime: 0");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -317,19 +355,145 @@ public class CellularGUI extends JFrame implements Observer{
         );
         
         // RFM add
-        slider_size.setValue(10);
-        slider_speed.setValue(10);
+        this.slider_size.setValue(10);
+        this.slider_speed.setValue(50);
+        this.cb_form.setEnabled(false);
+        this.cb_pattern.setEnabled(false);
         
         //pack();       
     }
     
+    public void initControllers(){
+        // init game controller
+        GameController game_controller = new GameController(null, this);
+        game_controller.initialize(); // involving model initialization
+        
+        this.controllers.put("game_controller", game_controller);
+        this.pan_display.setCellularGUI(this);
+    }
+    
     public void initEvents(){
+        
+        this.btn_play.addActionListener(
+            new ActionListener(){
+                public void actionPerformed(ActionEvent evt){
+                    System.out.println("CellularGUI > play action");
+                    GameController game_controller = (GameController) 
+                        controllers.get("game_controller");
+                    Game game = (Game) game_controller.getModel();
+                    game.setPlay(true);
+                    
+                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    long time = cal.getTimeInMillis();
+                    game.setInit_time(time);
+                    
+                    game_controller.setModel(game);
+                    controllers.put("game_controller", game_controller);
+
+                    new SwingWorker<Boolean, Void>() {
+                        @Override
+                        protected Boolean doInBackground() throws Exception {
+                            while(game.isPlay()){
+                                //System.out.println("[Info]: running while");
+                                pan_display.repaint();
+                                
+                                int speed = game.getSetting().getSpeed();
+                                if (speed == 0)
+                                    speed = 1;
+                                double sleep_min = 0.5;
+                                double sleep_max = 1.5;
+                                double sleep = (sleep_min + (sleep_max-sleep_min)*
+                                        ((double)speed/(double)100))*1000;                                
+                                
+                                try {
+                                    System.out.println("[Info]: sleep for (ms) "+sleep);
+                                    Thread.sleep((long) sleep);
+                                } catch (InterruptedException e) {
+                                    System.out.println("[ERROR]: sleep failed");
+                                }
+                            }                            
+                            return true;
+                        }
+                    }.execute();
+                    
+                    btn_play.setEnabled(false);
+                    btn_pause.setEnabled(true);
+                }
+            }
+        );
+        
+        this.btn_pause.addActionListener(
+            new ActionListener(){
+                public void actionPerformed(ActionEvent evt){
+                    System.out.println("CellularGUI > resume action");
+                    GameController game_controller = (GameController) 
+                        controllers.get("game_controller");
+                    Game game = (Game) game_controller.getModel();
+                    game.setPlay(false);
+                    
+                    game_controller.setModel(game);
+                    controllers.put("game_controller", game_controller);
+                    pan_display.repaint();
+                    
+                    btn_pause.setEnabled(false);
+                    btn_play.setEnabled(true);
+                }
+            }
+        );
+        
+        this.slider_speed.addChangeListener(
+            new ChangeListener(){               
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    JSlider source = (JSlider)e.getSource();
+                    if (!source.getValueIsAdjusting()) {
+                        int speed = (int)source.getValue();
+                        
+                        GameController game_controller = (GameController) 
+                                        controllers.get("game_controller");
+                        Game game = (Game) game_controller.getModel();
+                        game.getSetting().setSpeed(speed);
+
+                        game_controller.setModel(game);
+                        controllers.put("game_controller", game_controller);
+                    }
+                }                
+            }
+        );
+        
+        this.slider_size.addChangeListener(
+            new ChangeListener(){               
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    JSlider source = (JSlider)e.getSource();
+                    if (!source.getValueIsAdjusting()) {
+                        int size = (int)source.getValue();
+                        if (size == 0) size = 1;
+                        System.out.println("[Info] size: "+size);
+                        
+                        GameController game_controller = (GameController) 
+                                        controllers.get("game_controller");
+                        game_controller.initialize();
+                        Game game = (Game) game_controller.getModel();
+                        game.getSetting().setSize(size);
+                        game.setPlay(false);
+
+                        game_controller.setModel(game);
+                        controllers.put("game_controller", game_controller);
+                        
+                        btn_pause.setEnabled(false);
+                        btn_play.setEnabled(true);
+                        
+                        pan_display.repaint();
+                    }
+                }
+            }
+        );
         
     }
     
     @Override
     public void update(Observable observ) {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
+    }    
 }

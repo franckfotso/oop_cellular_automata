@@ -10,19 +10,31 @@ import java.util.Date;
 public class Game extends AbstractModel{
     
     private int trick;
-    private Date runtime;
+    private long init_time;
+    private long run_time;
     private Display display;
     private Setting setting;
+    private boolean play = false;
 
     public Game() {
     }
 
-    public Game(int trick, Date runtime, Display display, Setting setting) {
+    public Game(int trick, long init_time, Display display, Setting setting) {
         this.trick = trick;
-        this.runtime = runtime;
+        this.run_time = 0;
+        this.init_time = init_time;
         this.display = display;
         this.setting = setting;
     }
+
+    public boolean isPlay() {
+        return play;
+    }
+
+    public void setPlay(boolean play) {
+        this.play = play;
+    }
+
 
     public int getTrick() {
         return trick;
@@ -32,13 +44,22 @@ public class Game extends AbstractModel{
         this.trick = trick;
     }
 
-    public Date getRuntime() {
-        return runtime;
+    public long getInit_time() {
+        return init_time;
     }
 
-    public void setRuntime(Date runtime) {
-        this.runtime = runtime;
+    public void setInit_time(long init_time) {
+        this.init_time = init_time;
     }
+
+    public long getRun_time() {
+        return run_time;
+    }
+
+    public void setRun_time(long run_time) {
+        this.run_time = run_time;
+    }
+
 
     public Display getDisplay() {
         return display;
