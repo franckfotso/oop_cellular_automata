@@ -24,9 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import oop.cellular.controller.AbstractController;
 import oop.cellular.controller.GameController;
-import oop.cellular.model.Display;
 import oop.cellular.model.Game;
-import oop.cellular.model.Setting;
 import oop.cellular.observer.Observable;
 import oop.cellular.observer.Observer;
 
